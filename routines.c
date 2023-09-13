@@ -1,29 +1,36 @@
 #include "philosophers.h"
-void    ft_eat(int philo_id, int eat_time)
+void    ft_eat(t_philo *philos)
 {
-    ft_printf("%d. philo is eating...", philo_id);
-    usleep(eat_time);
+    pthread_mutex_lock(philos->r_fork);
+    ft_print_message("take the right fork", philos);
+    pthread_mutex_lock(philos->l_fork);
+    ft_print_message("take the left fork", philos);
+    ft_print_message("eating", philos);
+    usleep(philos->eat_time*1000);
 }
 
-void    ft_sleep(int philo_id, int sleep_time)
+void    ft_sleep(t_philo *philos)
 {
-    ft_printf("%d. philo is sleeping...", philo_id);
-    usleep(sleep_time);
+    ft_print_message("sleeping", philos);
+    pthread_mutex_unlock(philos->r_fork);
+    pthread_mutex_unlock(philos->l_fork);
+    usleep(philos->sleep_time*1000);
 }
 
-void    ft_think(int philo_id)
+void    ft_think(t_philo *philos)
 {
-    ft_printf("%d. philo is thinking...", philo_id);
+    ft_print_message("thinking", philos);
 }
 
-void*   ft_routine(t_philo *philos)
+void *ft_routine(void *philos)
 {
     t_philo *philosopher;
 
     philosopher = (t_philo *)philos;
-    ft_eat(philosopher->philo_id, philosopher->eat_time);
-    ft_sleep(philosopher->philo_id, philosopher->sleep_time);
-    ft_think(philosopher->philo_id);
+
+    ft_eat(philosopher);
+    ft_sleep(philosopher);
+    ft_think(philosopher);
     
-    return(philos);
+    return(0);
 }
